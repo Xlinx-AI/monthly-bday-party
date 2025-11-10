@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
 import Navigation from "@/components/ui/Navigation";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -41,11 +41,12 @@ interface EventDetails {
 export default function EventDetailsPage() {
   const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [event, setEvent] = useState<EventDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [inviteCode, setInviteCode] = useState("");
   const [joining, setJoining] = useState(false);
-  const [paymentSecret, setPaymentSecret] = useState<string | null>(null);
+  const [paying, setPaying] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -57,22 +58,24 @@ export default function EventDetailsPage() {
     }
   }, [initialInvite]);
 
-  useEffect(() => {
-    const loadEvent = async () => {
-      try {
-        const response = await fetch(`/api/events/${params.id}`);
-        if (!response.ok) {
-          throw new Error("Не удалось загрузить мероприятие");
-        }
-        const data = await response.json();
-        setEvent(data.event);
-      } catch (error) {
-        setError(error instanceof Error ? error.message : "Ошибка загрузки");
-      } finally {
-        setLoading(false);
+  const fetchEvent = async () => {
+    try {
+      const response = await fetch(`/api/events/${params.id}`);
+      if (!response.ok) {
+        throw new Error("Не удалось загрузить мероприятие");
       }
-    };
-    loadEvent();
+      const data = await response.json();
+      setEvent(data.event);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Ошибка загрузки");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEvent();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id]);
 
   const handleJoin = async () => {
@@ -89,7 +92,8 @@ export default function EventDetailsPage() {
       if (!response.ok) {
         throw new Error(data.error || "Не удалось присоединиться");
       }
-      setMessage("Вы успешно присоединились! Перейдите к оплате.");
+      setMessage("✅ Вы успешно присоединились! Теперь оплатите билет.");
+      await fetchEvent();
     } catch (error) {
       setError(error instanceof Error ? error.message : "Ошибка присоединения");
     } finally {
@@ -97,7 +101,8 @@ export default function EventDetailsPage() {
     }
   };
 
-  const handleCreatePaymentIntent = async () => {
+  const handlePayment = async () => {
+    setPaying(true);
     setMessage(null);
     setError(null);
     try {
@@ -112,19 +117,22 @@ export default function EventDetailsPage() {
         throw new Error(data.error || "Не удалось создать платеж");
       }
 
-      setPaymentSecret(data.clientSecret);
-      setMessage(
-        "Платеж инициирован. Используйте Stripe Elements на фронтенде для завершения оплаты."
-      );
+      if (data.confirmationUrl) {
+        window.location.href = data.confirmationUrl;
+      } else {
+        setError("Не удалось получить ссылку на оплату");
+      }
     } catch (error) {
       setError(error instanceof Error ? error.message : "Ошибка оплаты");
+    } finally {
+      setPaying(false);
     }
   };
 
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-lg text-slate-600">Загрузка...</div>
+        <div className="text-lg text-gray-300">⏳ Загрузка...</div>
       </div>
     );
   }
@@ -132,7 +140,9 @@ export default function EventDetailsPage() {
   if (!event) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-lg text-red-500">Мероприятие не найдено</div>
+        <div className="glass-card p-8">
+          <div className="text-lg text-red-400">❌ Мероприятие не найдено</div>
+        </div>
       </div>
     );
   }
@@ -140,61 +150,61 @@ export default function EventDetailsPage() {
   const isHost = Boolean(event.inviteCode);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen">
       <Navigation />
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="space-y-6 rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
+        <div className="glass-card p-8 space-y-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
-              <p className="text-sm font-medium uppercase tracking-[0.2em] text-purple-500">
+              <p className="text-sm font-bold uppercase tracking-[0.2em] text-purple-400">
                 {event.interest.name}
               </p>
-              <h1 className="mt-2 text-3xl font-bold text-slate-900">
+              <h1 className="mt-2 text-4xl font-black text-white">
                 {event.title}
               </h1>
-              <p className="mt-2 text-sm text-slate-500">
-                Организатор: {event.host.name}
+              <p className="mt-2 text-sm text-gray-400">
+                🎉 Организатор: <span className="text-purple-400 font-semibold">{event.host.name}</span>
               </p>
             </div>
-            <div className="rounded-lg bg-slate-100 px-4 py-2 text-right text-sm text-slate-600">
-              <p>
-                Дата: {new Date(event.eventDate).toLocaleString("ru-RU", {
+            <div className="glass-effect rounded-2xl border border-white/20 px-6 py-4 text-right text-sm text-gray-300">
+              <p className="mb-2">
+                📅 {new Date(event.eventDate).toLocaleString("ru-RU", {
                   dateStyle: "long",
                   timeStyle: "short",
                 })}
               </p>
-              <p>Место: {event.location}</p>
-              <p>Билет: {event.ticketPrice} ₽</p>
+              <p className="mb-2">📍 {event.location}</p>
+              <p className="text-lg font-bold text-gradient">{event.ticketPrice} ₽</p>
             </div>
           </div>
 
-          <div className="space-y-4 text-slate-600">
-            <h2 className="text-xl font-semibold text-slate-900">Описание</h2>
-            <p>{event.description || "Организатор пока не добавил описание."}</p>
+          <div className="space-y-4 text-gray-300">
+            <h2 className="text-2xl font-bold text-white">Описание</h2>
+            <p className="leading-relaxed">{event.description || "Организатор пока не добавил описание, но обещает, что будет весело 🎊"}</p>
           </div>
 
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-slate-900">
+            <h2 className="text-2xl font-bold text-white">
               Участники ({event.guests.length}/{event.maxGuests})
             </h2>
             <div className="grid gap-3 sm:grid-cols-2">
               {event.guests.map((guest) => (
-                <div key={guest.id} className="rounded-lg border border-slate-200 p-3 text-sm">
-                  <p className="font-medium text-slate-900">{guest.name}</p>
-                  <p className="text-slate-500">{guest.email}</p>
+                <div key={guest.id} className="glass-effect rounded-xl border border-white/10 p-4 text-sm">
+                  <p className="font-bold text-white">{guest.name}</p>
+                  <p className="text-gray-400 text-xs">{guest.email}</p>
                   {guest.paymentStatus && (
                     <p
-                      className={`mt-1 inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
+                      className={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-bold ${
                         guest.paymentStatus === "paid"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-yellow-100 text-yellow-600"
+                          ? "bg-green-500/20 text-green-300 border border-green-500/30"
+                          : "bg-yellow-500/20 text-yellow-300 border border-yellow-500/30"
                       }`}
                     >
-                      {guest.paymentStatus === "paid" ? "Оплачено" : "Ожидание оплаты"}
+                      {guest.paymentStatus === "paid" ? "✅ Оплачено" : "⏳ Ожидание"}
                     </p>
                   )}
                   {guest.ticketNumber && (
-                    <p className="mt-2 text-xs text-slate-500">{guest.ticketNumber}</p>
+                    <p className="mt-2 text-xs text-gray-500 font-mono">{guest.ticketNumber}</p>
                   )}
                 </div>
               ))}
@@ -202,11 +212,11 @@ export default function EventDetailsPage() {
           </div>
 
           {!isHost && (
-            <div className="space-y-4 rounded-xl border border-dashed border-purple-200 bg-purple-50 p-6">
-              <h2 className="text-xl font-semibold text-purple-700">
-                Присоединиться к вечеринке
+            <div className="space-y-4 glass-card p-6 border-2 border-purple-500/30">
+              <h2 className="text-2xl font-bold text-gradient">
+                🎊 Присоединиться к вечеринке
               </h2>
-              <p className="text-sm text-purple-700">
+              <p className="text-sm text-gray-300">
                 Введите код приглашения, полученный от организатора, и подтвердите своё участие.
               </p>
               <Input
@@ -217,50 +227,50 @@ export default function EventDetailsPage() {
                 required
               />
               <div className="flex flex-wrap gap-3">
-                <Button onClick={handleJoin} disabled={joining || !inviteCode}>
-                  {joining ? "Присоединяем..." : "Присоединиться"}
+                <Button onClick={handleJoin} disabled={joining || !inviteCode} glow>
+                  {joining ? "⏳ Присоединяем..." : "✨ Присоединиться"}
                 </Button>
-                <Button variant="outline" onClick={handleCreatePaymentIntent}>
-                  Оплатить участие
+                <Button variant="liquid" onClick={handlePayment} disabled={paying}>
+                  {paying ? "⏳ Создаём платёж..." : "💳 Оплатить участие"}
                 </Button>
               </div>
-              {paymentSecret && (
-                <div className="rounded-lg bg-white p-4 text-xs text-slate-600">
-                  <p className="font-semibold text-slate-800">Client secret:</p>
-                  <p className="break-all">{paymentSecret}</p>
-                  <p className="mt-2">
-                    Используйте его с Stripe Elements или мобильным SDK для завершения платежа.
-                  </p>
-                </div>
-              )}
             </div>
           )}
 
           {event.inviteCode && (
-            <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-6">
-              <h2 className="text-xl font-semibold text-slate-900">
-                Поделитесь приглашением
+            <div className="space-y-3 glass-card p-6 border-2 border-cyan-500/30">
+              <h2 className="text-2xl font-bold text-white">
+                📲 Поделитесь приглашением
               </h2>
-              <p className="text-sm text-slate-600">
-                Отправьте друзьям ссылку для участия:
+              <p className="text-sm text-gray-300">
+                Скопируйте ссылку и отправьте друзьям в мессенджеры:
               </p>
-              <div className="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-700">
-                <p className="break-all">
-                  {typeof window !== "undefined"
-                    ? `${window.location.origin}/events/${event.id}?invite=${event.inviteCode}`
-                    : `Ссылка доступна после загрузки страницы`}
-                </p>
+              <div className="glass-effect rounded-xl border border-white/20 p-4 text-sm text-gray-300 break-all font-mono">
+                {typeof window !== "undefined"
+                  ? `${window.location.origin}/events/${event.id}?invite=${event.inviteCode}`
+                  : `Ссылка доступна после загрузки страницы`}
               </div>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    `${window.location.origin}/events/${event.id}?invite=${event.inviteCode}`
+                  );
+                  setMessage("📋 Ссылка скопирована!");
+                }}
+              >
+                📋 Скопировать ссылку
+              </Button>
             </div>
           )}
 
           {message && (
-            <div className="rounded-lg bg-green-50 p-4 text-sm text-green-700">
+            <div className="glass-effect rounded-xl bg-green-500/20 border border-green-500/30 p-4 text-sm text-green-200">
               {message}
             </div>
           )}
           {error && (
-            <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">
+            <div className="glass-effect rounded-xl bg-red-500/20 border border-red-500/30 p-4 text-sm text-red-200">
               {error}
             </div>
           )}

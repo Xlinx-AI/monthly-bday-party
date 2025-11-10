@@ -44,28 +44,29 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-50 via-white to-sky-50 px-4 py-12">
-      <div className="w-full max-w-md space-y-8 rounded-2xl border border-slate-100 bg-white p-8 shadow-xl">
-        <div>
-          <h2 className="text-center text-3xl font-bold text-slate-900">
-            Вход в аккаунт
+    <div className="flex min-h-screen items-center justify-center px-4 py-12">
+      <div className="w-full max-w-lg glass-card p-10 space-y-8">
+        <div className="text-center">
+          <h2 className="text-4xl font-black text-gradient mb-4">
+            Добро пожаловать обратно
           </h2>
-          <p className="mt-2 text-center text-sm text-slate-600">
+          <p className="text-gray-300 text-lg">Продолжайте делать праздник ежемесячным</p>
+          <p className="mt-3 text-sm text-gray-400">
             Нет аккаунта?{" "}
-            <Link href="/register" className="font-semibold text-purple-600 hover:text-purple-500">
-              Зарегистрируйтесь
+            <Link href="/register" className="font-bold text-purple-400 hover:text-purple-300">
+              Зарегистрируйтесь →
             </Link>
           </p>
         </div>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-5" onSubmit={handleSubmit}>
           <Input
             label="Email"
             name="email"
             type="email"
             autoComplete="email"
             required
-            placeholder="ivan@example.com"
+            placeholder="your@email.com"
           />
 
           <Input
@@ -74,10 +75,11 @@ export default function LoginPage() {
             type="password"
             autoComplete="current-password"
             required
+            placeholder="Ваш пароль"
           />
 
           {error && (
-            <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
+            <div className="glass-effect rounded-xl bg-red-500/20 border border-red-500/30 p-4 text-sm text-red-200">
               {error}
             </div>
           )}
@@ -87,9 +89,14 @@ export default function LoginPage() {
             className="w-full"
             size="lg"
             disabled={loading}
+            glow
           >
-            {loading ? "Вход..." : "Войти"}
+            {loading ? "⏳ Вход..." : "🚀 Продолжить"}
           </Button>
+
+          <p className="text-center text-xs text-gray-500">
+            Улыбнитесь — сегодня тоже найдётся повод отпраздновать.
+          </p>
         </form>
       </div>
     </div>

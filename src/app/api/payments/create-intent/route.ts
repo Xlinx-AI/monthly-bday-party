@@ -1,17 +1,14 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { eventGuests, events } from "@/db/schema";
+import { eventGuests, events, users } from "@/db/schema";
 import { getSession } from "@/lib/auth";
 import { and, eq } from "drizzle-orm";
-import Stripe from "stripe";
+import { YooCheckout, ICreatePayment } from "yookassa";
 
-const stripeSecret = process.env.STRIPE_SECRET_KEY;
+const shopId = process.env.YOOKASSA_SHOP_ID;
+const secretKey = process.env.YOOKASSA_SECRET_KEY;
 
-const stripe = stripeSecret
-  ? new Stripe(stripeSecret, {
-      apiVersion: "2024-06-20",
-    })
-  : null;
+const checkout = shopId && secretKey ? new YooCheckout({ shopId, secretKey }) : null;
 
 export async function POST(request: Request) {
   try {
@@ -21,7 +18,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
     }
 
-    if (!stripe) {
+    if (!checkout) {
       return NextResponse.json(
         { error: "Платежный провайдер не настроен" },
         { status: 500 }
@@ -32,6 +29,13 @@ export async function POST(request: Request) {
 
     const event = await db.query.events.findFirst({
       where: eq(events.id, eventId),
+      with: {
+        host: {
+          columns: {
+            name: true,
+          },
+        },
+      },
     });
 
     if (!event) {
@@ -62,25 +66,63 @@ export async function POST(request: Request) {
       );
     }
 
-    const amountInRubles = parseFloat(event.ticketPrice);
-    const amountInKopeks = Math.round(amountInRubles * 100);
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, session.userId),
+      columns: {
+        email: true,
+      },
+    });
 
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: amountInKopeks,
-      currency: "rub",
+    const amountInRubles = parseFloat(event.ticketPrice);
+
+    const idempotenceKey = `${guest.id}-${Date.now()}`;
+
+    const payment = await checkout.createPayment({
+      amount: {
+        value: amountInRubles.toFixed(2),
+        currency: "RUB",
+      },
+      payment_method_data: {
+        type: "bank_card",
+      },
+      confirmation: {
+        type: "redirect",
+        return_url: `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/events/${eventId}?payment=success`,
+      },
+      description: `Билет на "${event.title}" от ${event.host.name}`,
       metadata: {
         eventId: event.id,
         guestId: guest.id,
         userId: session.userId,
+        ticketNumber: guest.ticketNumber,
       },
-    });
+      receipt: {
+        customer: {
+          email: user?.email,
+        },
+        items: [
+          {
+            description: `Билет на мероприятие "${event.title}"`,
+            quantity: "1",
+            amount: {
+              value: amountInRubles.toFixed(2),
+              currency: "RUB",
+            },
+            vat_code: 1,
+          },
+        ],
+      },
+      capture: true,
+    } as ICreatePayment, idempotenceKey);
 
     return NextResponse.json({
-      clientSecret: paymentIntent.client_secret,
+      paymentId: payment.id,
+      confirmationUrl: payment.confirmation?.confirmation_url,
       amount: amountInRubles,
+      status: payment.status,
     });
   } catch (error) {
-    console.error("Failed to create payment intent", error);
+    console.error("Failed to create payment", error);
     return NextResponse.json(
       { error: "Не удалось создать платеж" },
       { status: 500 }

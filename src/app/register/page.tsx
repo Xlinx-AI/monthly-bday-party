@@ -55,28 +55,31 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-50 via-white to-sky-50 px-4 py-12">
-      <div className="w-full max-w-md space-y-8 rounded-2xl border border-slate-100 bg-white p-8 shadow-xl">
-        <div>
-          <h2 className="text-center text-3xl font-bold text-slate-900">
-            Регистрация
+    <div className="flex min-h-screen items-center justify-center px-4 py-12">
+      <div className="w-full max-w-lg space-y-8 glass-card p-10">
+        <div className="text-center">
+          <h2 className="text-4xl font-black text-gradient mb-4">
+            Начните бесплатно
           </h2>
-          <p className="mt-2 text-center text-sm text-slate-600">
+          <p className="text-gray-300 text-lg">
+            Создайте аккаунт за 30 секунд
+          </p>
+          <p className="mt-3 text-sm text-gray-400">
             Уже есть аккаунт?{" "}
-            <Link href="/login" className="font-semibold text-purple-600 hover:text-purple-500">
-              Войти
+            <Link href="/login" className="font-bold text-purple-400 hover:text-purple-300">
+              Войти →
             </Link>
           </p>
         </div>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-5" onSubmit={handleSubmit}>
           <Input
-            label="Имя"
+            label="Как вас зовут?"
             name="name"
             type="text"
             autoComplete="name"
             required
-            placeholder="Иван Иванов"
+            placeholder="Ваше имя"
           />
 
           <Input
@@ -85,11 +88,11 @@ export default function RegisterPage() {
             type="email"
             autoComplete="email"
             required
-            placeholder="ivan@example.com"
+            placeholder="your@email.com"
           />
 
           <Input
-            label="Пароль"
+            label="Придумайте пароль"
             name="password"
             type="password"
             autoComplete="new-password"
@@ -105,7 +108,7 @@ export default function RegisterPage() {
           />
 
           <Input
-            label="Телефон (необязательно)"
+            label="Телефон (для уведомлений)"
             name="phone"
             type="tel"
             autoComplete="tel"
@@ -113,14 +116,14 @@ export default function RegisterPage() {
           />
 
           <Input
-            label="Город (необязательно)"
+            label="Ваш город"
             name="city"
             type="text"
             placeholder="Москва"
           />
 
           {error && (
-            <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
+            <div className="glass-effect rounded-xl bg-red-500/20 border border-red-500/30 p-4 text-sm text-red-200">
               {error}
             </div>
           )}
@@ -130,9 +133,14 @@ export default function RegisterPage() {
             className="w-full"
             size="lg"
             disabled={loading}
+            glow
           >
-            {loading ? "Регистрация..." : "Зарегистрироваться"}
+            {loading ? "⏳ Создаём аккаунт..." : "🎉 Зарегистрироваться"}
           </Button>
+
+          <p className="text-center text-xs text-gray-500">
+            Регистрируясь, вы соглашаетесь с тем, что мы будем делать ваши дни рождения незабываемыми 🎂
+          </p>
         </form>
       </div>
     </div>
