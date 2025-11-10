@@ -4,11 +4,18 @@ import { eventGuests, events, users } from "@/db/schema";
 import { getSession } from "@/lib/auth";
 import { and, eq } from "drizzle-orm";
 import { YooCheckout, ICreatePayment } from "yookassa";
+import { MOCK_ENABLED, MockYooKassa, logMockPayment } from "@/lib/payment-mock";
 
 const shopId = process.env.YOOKASSA_SHOP_ID;
 const secretKey = process.env.YOOKASSA_SECRET_KEY;
 
-const checkout = shopId && secretKey ? new YooCheckout({ shopId, secretKey }) : null;
+let checkout: YooCheckout | MockYooKassa | null = null;
+
+if (MOCK_ENABLED) {
+  checkout = new MockYooKassa({ shopId: shopId || "mock_shop", secretKey: secretKey || "mock_secret" });
+} else if (shopId && secretKey) {
+  checkout = new YooCheckout({ shopId, secretKey });
+}
 
 export async function POST(request: Request) {
   try {
@@ -77,7 +84,7 @@ export async function POST(request: Request) {
 
     const idempotenceKey = `${guest.id}-${Date.now()}`;
 
-    const payment = await checkout.createPayment({
+    const paymentPayload: ICreatePayment = {
       amount: {
         value: amountInRubles.toFixed(2),
         currency: "RUB",
@@ -113,13 +120,18 @@ export async function POST(request: Request) {
         ],
       },
       capture: true,
-    } as ICreatePayment, idempotenceKey);
+    };
+
+    logMockPayment("Creating payment", paymentPayload);
+
+    const payment = await (checkout as any).createPayment(paymentPayload, idempotenceKey);
 
     return NextResponse.json({
       paymentId: payment.id,
       confirmationUrl: payment.confirmation?.confirmation_url,
       amount: amountInRubles,
       status: payment.status,
+      mock: MOCK_ENABLED,
     });
   } catch (error) {
     console.error("Failed to create payment", error);
