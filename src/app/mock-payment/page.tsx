@@ -63,7 +63,7 @@ export default function MockPaymentPage() {
         </div>
 
         <div className="text-xs text-gray-500 mt-6">
-          Для включения реальных платежей установите <code className="bg-white/10 px-2 py-1 rounded">MBC_ENABLE_PAYMENT_MOCKS=false</code>
+          Для включения реальных платежей установите <code className="bg-white/10 px-2 py-1 rounded">TWELVEDR_ENABLE_PAYMENT_MOCKS=false</code>
         </div>
       </div>
     </div>

@@ -121,135 +121,141 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-lg text-slate-600">Загрузка...</div>
+        <div className="glass-card p-8">
+          <div className="text-xl text-white font-bold">⏳ Загружаем профиль...</div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen">
       <Navigation />
-      <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
-        <h1 className="mb-8 text-3xl font-bold text-slate-900">
-          Редактировать профиль
-        </h1>
+      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8 space-y-8">
+        <div className="glass-card p-10 text-center">
+          <h1 className="text-4xl font-black text-gradient mb-3">Ваш профиль 12DR</h1>
+          <p className="text-lg text-gray-300">
+            Управляйте данными, добавляйте интересы и делайте каждый месяц праздником.
+          </p>
+        </div>
 
-        <div className="space-y-6">
-          <form
-            onSubmit={handleProfileUpdate}
-            className="space-y-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
-          >
-            <h2 className="text-xl font-semibold text-slate-900">
-              Основная информация
-            </h2>
-
-            <Input
-              label="Имя"
-              name="name"
-              type="text"
-              defaultValue={user?.name}
-              required
-            />
-
-            <Input
-              label="Email (нельзя изменить)"
-              name="email"
-              type="email"
-              defaultValue={user?.email}
-              disabled
-            />
-
-            <Input
-              label="Дата рождения (нельзя изменить)"
-              name="birthDate"
-              type="date"
-              defaultValue={user?.birthDate}
-              disabled
-            />
-
-            <Input
-              label="Телефон"
-              name="phone"
-              type="tel"
-              defaultValue={user?.phone}
-            />
-
-            <Input
-              label="Город"
-              name="city"
-              type="text"
-              defaultValue={user?.city}
-            />
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">
-                О себе
-              </label>
-              <textarea
-                name="biography"
-                rows={4}
-                defaultValue={user?.biography}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-base text-slate-900 placeholder:text-slate-400 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-100"
-                placeholder="Расскажите о себе..."
-              />
-            </div>
-
-            <Button type="submit" disabled={saving}>
-              {saving ? "Сохранение..." : "Сохранить профиль"}
-            </Button>
-          </form>
-
-          <div className="space-y-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-semibold text-slate-900">
-              Мои интересы
-            </h2>
-
-            <p className="text-sm text-slate-600">
-              Укажите ваши интересы через запятую. Они будут использованы для
-              создания мероприятий и подбора похожих событий.
+        <form onSubmit={handleProfileUpdate} className="glass-card p-10 space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-2">Основная информация</h2>
+            <p className="text-sm text-gray-400">
+              Эти данные используют гости, чтобы лучше познакомиться с вами до мероприятия.
             </p>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">
-                Интересы (через запятую)
-              </label>
-              <textarea
-                value={interestsInput}
-                onChange={(e) => setInterestsInput(e.target.value)}
-                rows={3}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-base text-slate-900 placeholder:text-slate-400 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-100"
-                placeholder="караоке, настольные игры, йога, программирование"
-              />
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {user?.interests.map((interest) => (
-                <span
-                  key={interest.id}
-                  className="inline-block rounded-full bg-purple-100 px-3 py-1 text-sm font-medium text-purple-700"
-                >
-                  {interest.name}
-                </span>
-              ))}
-            </div>
-
-            <Button onClick={handleInterestsUpdate} disabled={saving}>
-              {saving ? "Сохранение..." : "Сохранить интересы"}
-            </Button>
           </div>
 
-          {error && (
-            <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">
-              {error}
-            </div>
-          )}
+          <Input
+            label="Имя"
+            name="name"
+            type="text"
+            defaultValue={user?.name}
+            required
+          />
 
-          {successMessage && (
-            <div className="rounded-lg bg-green-50 p-4 text-sm text-green-700">
-              {successMessage}
-            </div>
-          )}
+          <Input
+            label="Email (нельзя изменить)"
+            name="email"
+            type="email"
+            defaultValue={user?.email}
+            disabled
+          />
+
+          <Input
+            label="Дата рождения (нельзя изменить)"
+            name="birthDate"
+            type="date"
+            defaultValue={user?.birthDate}
+            disabled
+          />
+
+          <Input
+            label="Телефон"
+            name="phone"
+            type="tel"
+            defaultValue={user?.phone}
+            placeholder="+7 (999) 123-45-67"
+          />
+
+          <Input
+            label="Город"
+            name="city"
+            type="text"
+            defaultValue={user?.city}
+            placeholder="Москва"
+          />
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-200">
+              О себе
+            </label>
+            <textarea
+              name="biography"
+              rows={4}
+              defaultValue={user?.biography}
+              className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-base text-white placeholder:text-gray-400 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400/30"
+              placeholder="Расскажите о себе, любимых занятиях и форматах отдыха"
+            />
+          </div>
+
+          <Button type="submit" disabled={saving} glow>
+            {saving ? "Сохраняем..." : "💾 Сохранить профиль"}
+          </Button>
+        </form>
+
+        <div className="glass-card p-10 space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-2">Интересы</h2>
+            <p className="text-sm text-gray-400">
+              Укажите до 20 интересов — мы используем их для рекомендаций и темы ваших 12DR событий.
+            </p>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-200">
+              Интересы (через запятую)
+            </label>
+            <textarea
+              value={interestsInput}
+              onChange={(e) => setInterestsInput(e.target.value)}
+              rows={3}
+              className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-base text-white placeholder:text-gray-400 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400/30"
+              placeholder="караоке, настольные игры, йога, программирование"
+            />
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {user?.interests.map((interest) => (
+              <span
+                key={interest.id}
+                className="inline-flex items-center rounded-full bg-purple-500/10 px-4 py-1 text-sm font-semibold text-purple-200"
+              >
+                {interest.name}
+              </span>
+            ))}
+          </div>
+
+          <Button onClick={handleInterestsUpdate} disabled={saving} glow type="button">
+            {saving ? "Обновляем..." : "✨ Сохранить интересы"}
+          </Button>
         </div>
+
+        {(error || successMessage) && (
+          <div className="glass-card p-6">
+            {error && (
+              <div className="rounded-2xl border border-red-500/40 bg-red-500/15 px-4 py-3 text-sm text-red-100">
+                {error}
+              </div>
+            )}
+            {successMessage && (
+              <div className="mt-4 rounded-2xl border border-green-500/40 bg-green-500/15 px-4 py-3 text-sm text-green-100">
+                {successMessage}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

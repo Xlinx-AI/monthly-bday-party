@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 
 export async function PUT(request: Request) {
   try {
-    const session = getSession();
+    const session = await getSession();
 
     if (!session) {
       return NextResponse.json(

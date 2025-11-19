@@ -9,7 +9,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = getSession();
+    const session = await getSession();
 
     if (!session) {
       return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
@@ -87,7 +87,7 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = getSession();
+    const session = await getSession();
 
     if (!session) {
       return NextResponse.json({ error: "Не авторизован" }, { status: 401 });

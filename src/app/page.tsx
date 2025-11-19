@@ -47,7 +47,7 @@ export default function Home() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500"></span>
               </span>
-              Запуск MVP в декабре 2025
+              12DR MVP — запуск в декабре 2025
             </div>
             
             <h1 className="text-5xl font-black tracking-tight sm:text-7xl mb-6">
@@ -57,9 +57,9 @@ export default function Home() {
             </h1>
             
             <p className="mx-auto max-w-2xl text-xl text-gray-300 leading-relaxed mb-8">
-              Первая в России платформа ежемесячных праздничных встреч. Создавайте события, 
-              приглашайте гостей и получайте{" "}
-              <span className="text-purple-400 font-bold">реальные деньги</span> в день рождения.
+              <span className="font-bold text-white">12DR</span> — первая в России платформа ежемесячных праздничных встреч.
+              Создавайте события, приглашайте гостей и получайте {" "}
+              <span className="text-purple-400 font-bold">реальные деньги</span> в каждый из 12 дней рождения.
             </p>
 
             <div className="flex flex-col gap-4 sm:flex-row justify-center items-center">

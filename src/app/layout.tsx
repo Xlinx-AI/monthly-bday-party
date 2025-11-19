@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Monthly Birthday Club",
-  description: "Monthly Birthday Club — сервис ежемесячных праздничных встреч для России и дружественного СНГ",
+  title: "12DR — 12 Дней Рождения в год",
+  description: "12DR — платформа ежемесячных праздников. Празднуйте день рождения каждый месяц, встречайте новых друзей и получайте деньги",
 };
 
 export default function RootLayout({

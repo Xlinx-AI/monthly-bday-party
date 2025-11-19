@@ -8,7 +8,7 @@ import { generateId } from "@/lib/utils";
 
 export async function GET() {
   try {
-    const session = getSession();
+    const session = await getSession();
 
     if (!session) {
       return NextResponse.json(
@@ -45,7 +45,7 @@ export async function GET() {
 
 export async function PUT(request: Request) {
   try {
-    const session = getSession();
+    const session = await getSession();
 
     if (!session) {
       return NextResponse.json(

@@ -17,7 +17,7 @@ export function generateInviteCode(): string {
 export function generateTicketNumber(): string {
   const timestamp = Date.now().toString(36).toUpperCase();
   const random = randomBytes(4).toString("hex").toUpperCase();
-  return `MBC-${timestamp}-${random}`;
+  return `12DR-${timestamp}-${random}`;
 }
 
 export function formatDate(date: Date | string): string {

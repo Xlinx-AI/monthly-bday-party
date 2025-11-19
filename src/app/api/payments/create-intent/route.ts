@@ -3,8 +3,10 @@ import { db } from "@/db";
 import { eventGuests, events, users } from "@/db/schema";
 import { getSession } from "@/lib/auth";
 import { and, eq } from "drizzle-orm";
-import { YooCheckout, ICreatePayment } from "yookassa";
 import { MOCK_ENABLED, MockYooKassa, logMockPayment } from "@/lib/payment-mock";
+
+// @ts-ignore - yookassa package doesn't have type definitions
+import { YooCheckout, ICreatePayment } from "yookassa";
 
 const shopId = process.env.YOOKASSA_SHOP_ID;
 const secretKey = process.env.YOOKASSA_SECRET_KEY;
@@ -19,7 +21,7 @@ if (MOCK_ENABLED) {
 
 export async function POST(request: Request) {
   try {
-    const session = getSession();
+    const session = await getSession();
 
     if (!session) {
       return NextResponse.json({ error: "Не авторизован" }, { status: 401 });

@@ -4,9 +4,9 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-8 md:grid-cols-3">
           <div className="space-y-4">
-            <h3 className="text-xl font-black text-gradient">Monthly Birthday Club</h3>
+            <h3 className="text-xl font-black text-gradient">12DR</h3>
             <p className="text-sm text-gray-300 leading-relaxed">
-              Превращаем каждый месяц в праздник. Объединяем людей через общие интересы и яркие эмоции.
+              12 дней рождения в год. Помогаем находить людей по интересам, отмечать чаще и зарабатывать на каждом празднике.
             </p>
           </div>
           
@@ -39,7 +39,7 @@ export default function Footer() {
               </a>
             </p>
             <p className="text-xs text-gray-500">
-              © 2025 Monthly Birthday Club. Проприетарная лицензия - Team Only
+              © 2025 12DR. Проприетарная лицензия — Team Only
             </p>
             <a
               href="https://github.com/Xlinx-AI/monthly-bday-party"
