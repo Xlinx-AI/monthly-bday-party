@@ -3,7 +3,7 @@ import { db } from "@/db";
 import { getSession } from "@/lib/auth";
 import { updateInterestsSchema } from "@/lib/validation";
 import { interests as interestsTable, userInterests } from "@/db/schema";
-import { and, eq, inArray } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { generateId } from "@/lib/utils";
 
 export async function GET() {

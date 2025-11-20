@@ -1,3 +1,5 @@
+import type { ICreatePayment } from "yookassa";
+
 export const MOCK_ENABLED = process.env.TWELVEDR_ENABLE_PAYMENT_MOCKS === "true";
 
 export interface MockPayment {
@@ -11,7 +13,7 @@ export interface MockPayment {
     type: string;
     confirmation_url?: string;
   };
-  metadata?: Record<string, string>;
+  metadata?: Record<string, string | number | undefined>;
 }
 
 export class MockYooKassa {
@@ -24,7 +26,7 @@ export class MockYooKassa {
     console.log("⚠️  MOCK MODE: YooKassa initialized in demo mode");
   }
 
-  async createPayment(payment: any, idempotenceKey: string): Promise<MockPayment> {
+  async createPayment(payment: ICreatePayment, idempotenceKey: string): Promise<MockPayment> {
     console.log("💳 MOCK: Creating payment", { payment, idempotenceKey });
     
     const mockPayment: MockPayment = {
@@ -59,8 +61,8 @@ export function createMockWebhookPayload(metadata: Record<string, string>, statu
   };
 }
 
-export function logMockPayment(message: string, data?: any) {
+export function logMockPayment(message: string, data?: unknown) {
   if (MOCK_ENABLED) {
-    console.log(`🎭 MOCK PAYMENT: ${message}`, data || "");
+    console.log(`🎭 MOCK PAYMENT: ${message}`, data ?? "");
   }
 }

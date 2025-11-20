@@ -4,19 +4,33 @@ import { eventGuests, events, users } from "@/db/schema";
 import { getSession } from "@/lib/auth";
 import { and, eq } from "drizzle-orm";
 import { MOCK_ENABLED, MockYooKassa, logMockPayment } from "@/lib/payment-mock";
-
-// @ts-ignore - yookassa package doesn't have type definitions
 import { YooCheckout, ICreatePayment } from "yookassa";
 
 const shopId = process.env.YOOKASSA_SHOP_ID;
 const secretKey = process.env.YOOKASSA_SECRET_KEY;
 
-let checkout: YooCheckout | MockYooKassa | null = null;
+type PaymentClient = {
+  createPayment: (
+    payload: ICreatePayment,
+    idempotenceKey: string
+  ) => Promise<{
+    id: string;
+    status: string;
+    confirmation?: {
+      confirmation_url?: string;
+    };
+  }>;
+};
+
+let checkout: PaymentClient | null = null;
 
 if (MOCK_ENABLED) {
   checkout = new MockYooKassa({ shopId: shopId || "mock_shop", secretKey: secretKey || "mock_secret" });
 } else if (shopId && secretKey) {
-  checkout = new YooCheckout({ shopId, secretKey });
+  const realCheckout = new YooCheckout({ shopId, secretKey });
+  checkout = {
+    createPayment: (payload, idempotenceKey) => realCheckout.createPayment(payload, idempotenceKey),
+  };
 }
 
 export async function POST(request: Request) {
@@ -126,7 +140,7 @@ export async function POST(request: Request) {
 
     logMockPayment("Creating payment", paymentPayload);
 
-    const payment = await (checkout as any).createPayment(paymentPayload, idempotenceKey);
+    const payment = await checkout.createPayment(paymentPayload, idempotenceKey);
 
     return NextResponse.json({
       paymentId: payment.id,

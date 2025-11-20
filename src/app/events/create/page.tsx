@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navigation from "@/components/ui/Navigation";
@@ -13,7 +14,6 @@ type Interest = {
 
 export default function CreateEventPage() {
   const router = useRouter();
-  const [interests, setInterests] = useState<Interest[]>([]);
   const [userInterests, setUserInterests] = useState<Interest[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -28,7 +28,6 @@ export default function CreateEventPage() {
           return;
         }
         const data = await response.json();
-        setInterests(data.interests || []);
         setUserInterests(data.userInterests || []);
       } catch (error) {
         console.error("Failed to load interests", error);
@@ -127,9 +126,9 @@ export default function CreateEventPage() {
             {userInterests.length === 0 && (
               <p className="mt-2 text-xs text-red-600">
                 У вас нет интересов. Добавьте их в{" "}
-                <a href="/profile" className="underline">
+                <Link href="/profile" className="underline">
                   профиле
-                </a>
+                </Link>
                 .
               </p>
             )}

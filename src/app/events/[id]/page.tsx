@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useParams, useSearchParams, useRouter } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import Navigation from "@/components/ui/Navigation";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -41,7 +41,6 @@ interface EventDetails {
 export default function EventDetailsPage() {
   const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
-  const router = useRouter();
   const [event, setEvent] = useState<EventDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [inviteCode, setInviteCode] = useState("");
