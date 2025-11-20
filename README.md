@@ -134,10 +134,11 @@ cp .env.example .env.local
 
 ```env
 # Vercel Postgres (получите на dashboard.vercel.com)
-# Укажите хотя бы один из этих URL
-POSTGRES_URL="postgres://..."
-# POSTGRES_PRISMA_URL="postgres://..."
-# DATABASE_URL="postgres://..."
+# ВАЖНО: Используйте POOLED connection string (с "-pooler." в хосте)
+POSTGRES_URL="postgres://default:xxx@xxx-pooler.postgres.vercel-storage.com/verceldb?sslmode=require"
+
+# Опционально: для миграций можно использовать прямое подключение
+# POSTGRES_URL_NON_POOLED="postgres://default:xxx@xxx.postgres.vercel-storage.com/verceldb?sslmode=require"
 
 # JWT Secret (сгенерируйте: openssl rand -base64 32)
 JWT_SECRET="your-secret-key"
@@ -152,6 +153,41 @@ NEXT_PUBLIC_BASE_URL="http://localhost:3000"
 # Demo mode
 TWELVEDR_ENABLE_PAYMENT_MOCKS=true
 ```
+
+> **⚠️ Важно про подключение к БД:**  
+> - Приложение использует `@vercel/postgres` с пулом соединений, который **требует** pooled connection string  
+> - Рекомендуется использовать строку с `-pooler.` в адресе для оптимальной производительности
+> - 12DR **автоматически конвертирует** direct connection strings в pooled при необходимости
+> - Поддерживаются переменные: `POSTGRES_URL`, `POSTGRES_PRISMA_URL`, `POSTGRES_URL_NON_POOLING`, `DATABASE_URL`
+
+#### Если у вас Vercel Prisma Postgres
+
+Если вы создали базу данных через Vercel с интеграцией Prisma, у вас могут быть следующие переменные:
+
+```bash
+# В Vercel Dashboard вы увидите:
+POSTGRES_URL="postgres://default:xxx@xxx-pooler.postgres.vercel-storage.com:5432/verceldb"          # ✅ Pooled
+POSTGRES_PRISMA_URL="postgres://default:xxx@xxx-pooler.postgres.vercel-storage.com:5432/verceldb?pgbouncer=true&connect_timeout=15"  # ✅ Pooled
+POSTGRES_URL_NON_POOLING="postgres://default:xxx@xxx.postgres.vercel-storage.com:5432/verceldb"    # Direct
+```
+
+**Настройка для 12DR:**
+
+```bash
+# .env.local - Любой из этих вариантов работает:
+
+# Вариант 1: Только POSTGRES_URL (рекомендуется)
+POSTGRES_URL="postgres://default:xxx@xxx-pooler.postgres.vercel-storage.com:5432/verceldb"
+
+# Вариант 2: Только POSTGRES_PRISMA_URL (приложение автоматически использует его)
+POSTGRES_PRISMA_URL="postgres://default:xxx@xxx-pooler.postgres.vercel-storage.com:5432/verceldb?pgbouncer=true&connect_timeout=15"
+
+# Вариант 3: Даже прямое подключение (приложение конвертирует в pooled автоматически)
+POSTGRES_URL_NON_POOLING="postgres://default:xxx@xxx.postgres.vercel-storage.com:5432/verceldb"
+```
+
+**Автоматическая конвертация:**  
+12DR автоматически преобразует прямые (direct) подключения в pooled для serverless runtime. Вы увидите предупреждение в логах при запуске.
 
 ### 4. Применение схемы базы данных
 
