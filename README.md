@@ -134,10 +134,11 @@ cp .env.example .env.local
 
 ```env
 # Vercel Postgres (получите на dashboard.vercel.com)
-# Укажите хотя бы один из этих URL
-POSTGRES_URL="postgres://..."
-# POSTGRES_PRISMA_URL="postgres://..."
-# DATABASE_URL="postgres://..."
+# ВАЖНО: Используйте POOLED connection string (с "-pooler." в хосте)
+POSTGRES_URL="postgres://default:xxx@xxx-pooler.postgres.vercel-storage.com/verceldb?sslmode=require"
+
+# Опционально: для миграций можно использовать прямое подключение
+# POSTGRES_URL_NON_POOLED="postgres://default:xxx@xxx.postgres.vercel-storage.com/verceldb?sslmode=require"
 
 # JWT Secret (сгенерируйте: openssl rand -base64 32)
 JWT_SECRET="your-secret-key"
@@ -152,6 +153,11 @@ NEXT_PUBLIC_BASE_URL="http://localhost:3000"
 # Demo mode
 TWELVEDR_ENABLE_PAYMENT_MOCKS=true
 ```
+
+> **⚠️ Важно про подключение к БД:**  
+> - Приложение использует `@vercel/postgres` с пулом соединений, который **требует** pooled connection string  
+> - В Vercel Dashboard скопируйте строку подключения, помеченную как **`POSTGRES_URL`** (содержит `-pooler.` в адресе)  
+> - **НЕ** используйте `POSTGRES_URL_NON_POOLED` или `POSTGRES_PRISMA_URL` для переменной `POSTGRES_URL`
 
 ### 4. Применение схемы базы данных
 
