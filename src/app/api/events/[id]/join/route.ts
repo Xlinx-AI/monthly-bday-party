@@ -1,13 +1,13 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { eventGuests, events } from "@/db/schema";
 import { getSession } from "@/lib/auth";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { generateId, generateTicketNumber } from "@/lib/utils";
 
 export async function POST(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getSession();
@@ -25,8 +25,10 @@ export async function POST(
       );
     }
 
+    const { id } = await context.params;
+
     const event = await db.query.events.findFirst({
-      where: eq(events.id, params.id),
+      where: eq(events.id, id),
       with: {
         guests: true,
       },
