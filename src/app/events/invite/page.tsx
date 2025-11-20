@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Navigation from "@/components/ui/Navigation";
 import Button from "@/components/ui/Button";
@@ -26,7 +26,7 @@ interface InviteEvent {
   };
 }
 
-export default function InvitePage() {
+function InvitePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [event, setEvent] = useState<InviteEvent | null>(null);
@@ -119,5 +119,19 @@ export default function InvitePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function InvitePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-slate-50">
+          <div className="text-lg text-slate-600">Загрузка...</div>
+        </div>
+      }
+    >
+      <InvitePageContent />
+    </Suspense>
   );
 }
