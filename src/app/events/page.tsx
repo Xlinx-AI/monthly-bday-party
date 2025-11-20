@@ -48,7 +48,16 @@ export default function EventsPage() {
   };
 
   useEffect(() => {
-    fetchEvents();
+    const loadInitialEvents = async () => {
+      const params = new URLSearchParams();
+      const response = await fetch(`/api/events/feed?${params.toString()}`);
+      if (response.ok) {
+        const data = await response.json();
+        setEvents(data.events || []);
+      }
+      setLoading(false);
+    };
+    void loadInitialEvents();
   }, []);
 
   return (

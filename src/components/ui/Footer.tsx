@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer className="glass-effect border-t border-white/10 mt-20">
@@ -14,13 +16,13 @@ export default function Footer() {
             <h4 className="text-sm font-bold text-gray-200 uppercase tracking-wider">Платформа</h4>
             <ul className="space-y-2 text-sm text-gray-300">
               <li>
-                <a href="/events" className="hover:text-purple-400 transition-colors">Лента событий</a>
+                <Link href="/events" className="hover:text-purple-400 transition-colors">Лента событий</Link>
               </li>
               <li>
-                <a href="/dashboard" className="hover:text-purple-400 transition-colors">Мои мероприятия</a>
+                <Link href="/dashboard" className="hover:text-purple-400 transition-colors">Мои мероприятия</Link>
               </li>
               <li>
-                <a href="/profile" className="hover:text-purple-400 transition-colors">Профиль</a>
+                <Link href="/profile" className="hover:text-purple-400 transition-colors">Профиль</Link>
               </li>
             </ul>
           </div>
