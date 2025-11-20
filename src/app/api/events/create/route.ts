@@ -8,7 +8,7 @@ import { generateId, generateInviteCode } from "@/lib/utils";
 
 export async function POST(request: Request) {
   try {
-    const session = getSession();
+    const session = await getSession();
 
     if (!session) {
       return NextResponse.json(

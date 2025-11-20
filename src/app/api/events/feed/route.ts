@@ -6,7 +6,7 @@ import { and, eq, gte, sql } from "drizzle-orm";
 
 export async function GET(request: Request) {
   try {
-    const session = getSession();
+    const session = await getSession();
 
     if (!session) {
       return NextResponse.json(

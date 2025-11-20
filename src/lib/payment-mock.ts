@@ -1,4 +1,4 @@
-export const MOCK_ENABLED = process.env.MBC_ENABLE_PAYMENT_MOCKS === "true";
+export const MOCK_ENABLED = process.env.TWELVEDR_ENABLE_PAYMENT_MOCKS === "true";
 
 export interface MockPayment {
   id: string;

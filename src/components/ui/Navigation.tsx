@@ -36,7 +36,7 @@ export default function Navigation() {
               href="/dashboard"
               className="text-2xl font-black text-gradient hover:scale-110 transition-transform"
             >
-              MBC
+              12DR
             </Link>
             <div className="hidden gap-2 md:flex">
               {navLinks.map((link) => (

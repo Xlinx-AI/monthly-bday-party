@@ -49,13 +49,13 @@ export async function POST(request: Request) {
       name,
       email,
       passwordHash,
-      birthDate: birthDateValue,
+      birthDate: birthDateValue.toISOString().slice(0, 10),
       phone,
       city,
     });
 
     const token = createSessionToken({ userId: id });
-    setSessionCookie(token);
+    await setSessionCookie(token);
 
     return NextResponse.json(
       {

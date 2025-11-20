@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 
-const SESSION_COOKIE = "mbc_session";
+const SESSION_COOKIE = "dr12_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 days
 
 const getJwtSecret = () => {
@@ -29,8 +29,9 @@ export const verifySessionToken = (token: string): SessionTokenPayload | null =>
   }
 };
 
-export const setSessionCookie = (token: string) => {
-  cookies().set(SESSION_COOKIE, token, {
+export const setSessionCookie = async (token: string) => {
+  const cookieStore = await cookies();
+  cookieStore.set(SESSION_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
@@ -39,12 +40,13 @@ export const setSessionCookie = (token: string) => {
   });
 };
 
-export const clearSessionCookie = () => {
-  cookies().delete(SESSION_COOKIE);
+export const clearSessionCookie = async () => {
+  const cookieStore = await cookies();
+  cookieStore.delete(SESSION_COOKIE);
 };
 
-export const getSession = (): SessionTokenPayload | null => {
-  const cookieStore = cookies();
+export const getSession = async (): Promise<SessionTokenPayload | null> => {
+  const cookieStore = await cookies();
   const sessionToken = cookieStore.get(SESSION_COOKIE)?.value;
   if (!sessionToken) {
     return null;
