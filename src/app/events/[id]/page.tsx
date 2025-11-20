@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Navigation from "@/components/ui/Navigation";
 import Button from "@/components/ui/Button";
@@ -38,7 +38,7 @@ interface EventDetails {
   guests: Guest[];
 }
 
-export default function EventDetailsPage() {
+function EventDetailsContent() {
   const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
   const [event, setEvent] = useState<EventDetails | null>(null);
@@ -158,16 +158,15 @@ export default function EventDetailsPage() {
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-purple-400">
                 {event.interest.name}
               </p>
-              <h1 className="mt-2 text-4xl font-black text-white">
-                {event.title}
-              </h1>
+              <h1 className="mt-2 text-4xl font-black text-white">{event.title}</h1>
               <p className="mt-2 text-sm text-gray-400">
                 🎉 Организатор: <span className="text-purple-400 font-semibold">{event.host.name}</span>
               </p>
             </div>
             <div className="glass-effect rounded-2xl border border-white/20 px-6 py-4 text-right text-sm text-gray-300">
               <p className="mb-2">
-                📅 {new Date(event.eventDate).toLocaleString("ru-RU", {
+                📅{" "}
+                {new Date(event.eventDate).toLocaleString("ru-RU", {
                   dateStyle: "long",
                   timeStyle: "short",
                 })}
@@ -179,7 +178,9 @@ export default function EventDetailsPage() {
 
           <div className="space-y-4 text-gray-300">
             <h2 className="text-2xl font-bold text-white">Описание</h2>
-            <p className="leading-relaxed">{event.description || "Организатор пока не добавил описание, но обещает, что будет весело 🎊"}</p>
+            <p className="leading-relaxed">
+              {event.description || "Организатор пока не добавил описание, но обещает, что будет весело 🎊"}
+            </p>
           </div>
 
           <div className="space-y-4">
@@ -202,9 +203,7 @@ export default function EventDetailsPage() {
                       {guest.paymentStatus === "paid" ? "✅ Оплачено" : "⏳ Ожидание"}
                     </p>
                   )}
-                  {guest.ticketNumber && (
-                    <p className="mt-2 text-xs text-gray-500 font-mono">{guest.ticketNumber}</p>
-                  )}
+                  {guest.ticketNumber && <p className="mt-2 text-xs text-gray-500 font-mono">{guest.ticketNumber}</p>}
                 </div>
               ))}
             </div>
@@ -212,9 +211,7 @@ export default function EventDetailsPage() {
 
           {!isHost && (
             <div className="space-y-4 glass-card p-6 border-2 border-purple-500/30">
-              <h2 className="text-2xl font-bold text-gradient">
-                🎊 Присоединиться к вечеринке
-              </h2>
+              <h2 className="text-2xl font-bold text-gradient">🎊 Присоединиться к вечеринке</h2>
               <p className="text-sm text-gray-300">
                 Введите код приглашения, полученный от организатора, и подтвердите своё участие.
               </p>
@@ -238,12 +235,8 @@ export default function EventDetailsPage() {
 
           {event.inviteCode && (
             <div className="space-y-3 glass-card p-6 border-2 border-cyan-500/30">
-              <h2 className="text-2xl font-bold text-white">
-                📲 Поделитесь приглашением
-              </h2>
-              <p className="text-sm text-gray-300">
-                Скопируйте ссылку и отправьте друзьям в мессенджеры:
-              </p>
+              <h2 className="text-2xl font-bold text-white">📲 Поделитесь приглашением</h2>
+              <p className="text-sm text-gray-300">Скопируйте ссылку и отправьте друзьям в мессенджеры:</p>
               <div className="glass-effect rounded-xl border border-white/20 p-4 text-sm text-gray-300 break-all font-mono">
                 {typeof window !== "undefined"
                   ? `${window.location.origin}/events/${event.id}?invite=${event.inviteCode}`
@@ -276,5 +269,19 @@ export default function EventDetailsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function EventDetailsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="text-lg text-gray-300">⏳ Загрузка...</div>
+        </div>
+      }
+    >
+      <EventDetailsContent />
+    </Suspense>
   );
 }
