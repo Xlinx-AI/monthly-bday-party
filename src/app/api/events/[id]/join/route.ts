@@ -7,7 +7,7 @@ import { generateId, generateTicketNumber } from "@/lib/utils";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getSession();
@@ -25,7 +25,7 @@ export async function POST(
       );
     }
 
-    const { id } = await params;
+    const { id } = await context.params;
 
     const event = await db.query.events.findFirst({
       where: eq(events.id, id),
