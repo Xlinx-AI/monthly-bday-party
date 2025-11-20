@@ -134,7 +134,10 @@ cp .env.example .env.local
 
 ```env
 # Vercel Postgres (получите на dashboard.vercel.com)
+# Укажите хотя бы один из этих URL
 POSTGRES_URL="postgres://..."
+# POSTGRES_PRISMA_URL="postgres://..."
+# DATABASE_URL="postgres://..."
 
 # JWT Secret (сгенерируйте: openssl rand -base64 32)
 JWT_SECRET="your-secret-key"
