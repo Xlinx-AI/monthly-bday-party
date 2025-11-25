@@ -8,6 +8,7 @@ import {
   integer,
   numeric,
   primaryKey,
+  index,
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
@@ -68,7 +69,11 @@ export const events = pgTable("events", {
   updatedAt: timestamp("updated_at", { withTimezone: false })
     .defaultNow()
     .notNull(),
-});
+}, (table) => ({
+  hostIdx: index("events_host_idx").on(table.hostUserId),
+  interestIdx: index("events_interest_idx").on(table.interestId),
+  dateIdx: index("events_date_idx").on(table.eventDate),
+}));
 
 export type Event = typeof events.$inferSelect;
 export type InsertEvent = typeof events.$inferInsert;
@@ -84,7 +89,10 @@ export const eventGuests = pgTable("event_guests", {
   updatedAt: timestamp("updated_at", { withTimezone: false })
     .defaultNow()
     .notNull(),
-});
+}, (table) => ({
+  eventIdx: index("event_guests_event_idx").on(table.eventId),
+  userIdx: index("event_guests_user_idx").on(table.userId),
+}));
 
 export type EventGuest = typeof eventGuests.$inferSelect;
 export type InsertEventGuest = typeof eventGuests.$inferInsert;
