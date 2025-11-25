@@ -16,17 +16,34 @@ const convertDirectToPooled = (connectionString: string) => {
     const hostname = url.hostname;
 
     const match = hostname.match(/^(.*?)(\.postgres\.vercel-storage\.com)$/);
-    if (!match) {
-      return undefined;
+    if (match) {
+      const [, prefix, suffix] = match;
+      const prefixParts = prefix.split(".");
+
+      if (prefixParts[0].endsWith("-pooler")) {
+        return undefined;
+      }
+
+      prefixParts[0] += "-pooler";
+      const newPrefix = prefixParts.join(".");
+
+      url.hostname = `${newPrefix}${suffix}`;
+      return url.toString();
     }
 
-    const [, prefix, suffix] = match;
-    if (!prefix || prefix.endsWith("-pooler")) {
-      return undefined;
+    // Generic fallback for neon.tech or other compatible domains
+    const parts = hostname.split(".");
+    if (
+      parts.length >= 3 &&
+      !parts[0].endsWith("-pooler") &&
+      (hostname.includes("vercel-storage.com") || hostname.includes("neon.tech"))
+    ) {
+      parts[0] = parts[0] + "-pooler";
+      url.hostname = parts.join(".");
+      return url.toString();
     }
 
-    url.hostname = `${prefix}-pooler${suffix}`;
-    return url.toString();
+    return undefined;
   } catch {
     return undefined;
   }
