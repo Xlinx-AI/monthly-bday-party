@@ -20,7 +20,7 @@ const convertDirectToPooled = (connectionString: string) => {
       return undefined;
     }
 
-    const [_, prefix, suffix] = match;
+    const [, prefix, suffix] = match;
     if (!prefix || prefix.endsWith("-pooler")) {
       return undefined;
     }
@@ -60,10 +60,14 @@ const resolveConnectionString = () => {
     return converted;
   }
 
-  throw new Error(
-    "Provided Postgres connection string appears to be direct (non-pooled) and could not be converted automatically. " +
-      "Please supply the pooled connection string from Vercel (hostname contains '-pooler.')."
+  // Allow non-standard or external connection strings to pass through with a warning
+  // instead of crashing the build.
+  console.warn(
+    "[12DR] Connection string does not appear to be a Vercel pooled connection (-pooler) " +
+      "and could not be auto-converted. Using as-is. " +
+      "If deploying to Vercel, ensure you are using the pooled connection string."
   );
+  return raw;
 };
 
 process.env.POSTGRES_URL = resolveConnectionString();
