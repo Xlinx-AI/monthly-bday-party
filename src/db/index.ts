@@ -1,92 +1,77 @@
 import { drizzle } from "drizzle-orm/vercel-postgres";
-import { sql as vercelSql } from "@vercel/postgres";
+import { createClient } from "@vercel/postgres";
 import * as schema from "./schema";
 
-const normalize = (value?: string | null) =>
-  value && value !== "undefined" ? value : undefined;
+const isPrismaUrl = (url: string) => url.includes("prisma.io");
 
-const isLocalConnection = (value: string) =>
-  value.includes("localhost") || value.includes("127.0.0.1");
-
-const isPooledConnection = (value: string) => value.includes("-pooler.");
-
-const convertDirectToPooled = (connectionString: string) => {
+const convertPooledToDirect = (connectionString: string) => {
   try {
     const url = new URL(connectionString);
     const hostname = url.hostname;
-
-    const match = hostname.match(/^(.*?)(\.postgres\.vercel-storage\.com)$/);
-    if (match) {
-      const [, prefix, suffix] = match;
-      const prefixParts = prefix.split(".");
-
-      if (prefixParts[0].endsWith("-pooler")) {
-        return undefined;
-      }
-
-      prefixParts[0] += "-pooler";
-      const newPrefix = prefixParts.join(".");
-
-      url.hostname = `${newPrefix}${suffix}`;
-      return url.toString();
+    
+    // Handle Vercel Postgres pooled URLs (remove -pooler)
+    if (hostname.includes("-pooler")) {
+        const parts = hostname.split(".");
+        const poolerIndex = parts.findIndex(p => p.endsWith("-pooler"));
+        if (poolerIndex !== -1) {
+            parts[poolerIndex] = parts[poolerIndex].replace("-pooler", "");
+            url.hostname = parts.join(".");
+            return url.toString();
+        }
     }
-
-    // Generic fallback for neon.tech or other compatible domains
-    const parts = hostname.split(".");
-    if (
-      parts.length >= 3 &&
-      !parts[0].endsWith("-pooler") &&
-      (hostname.includes("vercel-storage.com") || hostname.includes("neon.tech"))
-    ) {
-      parts[0] = parts[0] + "-pooler";
-      url.hostname = parts.join(".");
-      return url.toString();
-    }
-
-    return undefined;
+    return connectionString;
   } catch {
-    return undefined;
+    return connectionString;
   }
 };
 
-const resolveConnectionString = () => {
+const getConnectionString = () => {
+  // 1. Prefer explicit non-pooling var
+  if (process.env.POSTGRES_URL_NON_POOLING) {
+    return process.env.POSTGRES_URL_NON_POOLING;
+  }
+
+  // 2. Fallback to others, but clean them up
   const candidates = [
     process.env.POSTGRES_URL,
-    process.env.POSTGRES_PRISMA_URL,
-    process.env.POSTGRES_URL_NON_POOLING,
-    process.env.DATABASE_URL,
+    process.env.DATABASE_URL
   ];
 
-  const raw = candidates.map(normalize).find(Boolean);
-
-  if (!raw) {
-    throw new Error(
-      "Missing Postgres connection string. Set POSTGRES_URL, POSTGRES_PRISMA_URL, POSTGRES_URL_NON_POOLING, or DATABASE_URL."
-    );
+  for (const candidate of candidates) {
+    if (!candidate) continue;
+    
+    // If it's a Prisma URL, skip it as we can't use it with pg client directly/effectively
+    // or it causes the issue we saw.
+    if (isPrismaUrl(candidate)) {
+        continue;
+    }
+    
+    // If it's a pooled URL, try to convert to direct
+    return convertPooledToDirect(candidate);
   }
 
-  if (isLocalConnection(raw) || isPooledConnection(raw)) {
-    return raw;
-  }
-
-  const converted = convertDirectToPooled(raw);
-  if (converted) {
-    console.warn(
-      "[12DR] Converted direct Vercel Postgres connection string to pooled variant for serverless runtime."
-    );
-    return converted;
-  }
-
-  // Allow non-standard or external connection strings to pass through with a warning
-  // instead of crashing the build.
-  console.warn(
-    "[12DR] Connection string does not appear to be a Vercel pooled connection (-pooler) " +
-      "and could not be auto-converted. Using as-is. " +
-      "If deploying to Vercel, ensure you are using the pooled connection string."
-  );
-  return raw;
+  // 3. If we only found Prisma URLs or nothing, returns undefined
+  return undefined;
 };
 
-process.env.POSTGRES_URL = resolveConnectionString();
+const connectionString = getConnectionString();
 
-export const db = drizzle(vercelSql, { schema });
+if (!connectionString) {
+  console.warn(
+    "Missing valid Postgres connection string. Set POSTGRES_URL_NON_POOLING or POSTGRES_URL (must not be a Prisma URL). Using placeholder connection string."
+  );
+}
+
+const client = createClient({
+  connectionString: connectionString || "postgres://placeholder:placeholder@localhost:5432/placeholder",
+});
+
+try {
+    await client.connect();
+} catch (err) {
+    console.warn("Failed to connect to database during initialization:", err);
+    // Continue execution - if this is a build step that doesn't need DB, it might pass.
+    // If runtime needs DB, it will fail on query.
+}
+
+export const db = drizzle(client, { schema });

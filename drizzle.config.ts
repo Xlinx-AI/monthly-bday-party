@@ -3,16 +3,32 @@ import { defineConfig } from "drizzle-kit";
 const normalize = (value?: string | null) =>
   value && value !== "undefined" ? value : undefined;
 
-const connectionString =
-  normalize(process.env.POSTGRES_URL_NON_POOLING) ??
-  normalize(process.env.POSTGRES_PRISMA_URL) ??
-  normalize(process.env.POSTGRES_URL) ??
-  normalize(process.env.DATABASE_URL);
+const isPrismaUrl = (url: string) => url.includes("prisma.io");
+
+const getConnectionString = () => {
+    const direct = normalize(process.env.POSTGRES_URL_NON_POOLING);
+    if (direct) return direct;
+
+    const candidates = [
+        normalize(process.env.POSTGRES_URL),
+        normalize(process.env.DATABASE_URL)
+    ];
+
+    for (const candidate of candidates) {
+        if (candidate && !isPrismaUrl(candidate)) {
+            return candidate;
+        }
+    }
+    
+    return undefined;
+};
+
+const connectionString = getConnectionString();
 
 if (!connectionString) {
   throw new Error(
-    "Missing Postgres connection string for Drizzle. " +
-      "Set POSTGRES_URL (pooled) or POSTGRES_URL_NON_POOLING/POSTGRES_PRISMA_URL (direct)."
+    "Missing valid Postgres connection string for Drizzle. " +
+      "Set POSTGRES_URL_NON_POOLING (direct), POSTGRES_URL or DATABASE_URL (must not be a Prisma URL)."
   );
 }
 
