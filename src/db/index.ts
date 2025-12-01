@@ -57,13 +57,13 @@ const getConnectionString = () => {
 const connectionString = getConnectionString();
 
 if (!connectionString) {
-  throw new Error(
-    "Missing valid Postgres connection string. Set POSTGRES_URL_NON_POOLING or POSTGRES_URL (must not be a Prisma URL)."
+  console.warn(
+    "Missing valid Postgres connection string. Set POSTGRES_URL_NON_POOLING or POSTGRES_URL (must not be a Prisma URL). Using placeholder connection string."
   );
 }
 
 const client = createClient({
-  connectionString,
+  connectionString: connectionString || "postgres://placeholder:placeholder@localhost:5432/placeholder",
 });
 
 try {
