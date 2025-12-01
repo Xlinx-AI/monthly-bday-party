@@ -13,7 +13,7 @@
     "test:coverage": "jest --coverage",
     "stress": "npx tsx scripts/stress-test.ts",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit push"
+    "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
     "@vercel/postgres": "^0.10.0",
