@@ -79,36 +79,36 @@ export default function CreateEventPage() {
   if (loadingData) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-lg text-slate-600">Загрузка...</div>
+        <div className="text-lg text-white font-bold">⏳ Загрузка...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen">
       <Navigation />
       <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">
+          <h1 className="text-3xl font-black text-gradient">
             Создать мероприятие
           </h1>
-          <p className="mt-2 text-slate-600">
+          <p className="mt-2 text-gray-300">
             Заполните информацию о вашей вечеринке
           </p>
         </div>
 
         <form
           onSubmit={handleSubmit}
-          className="space-y-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
+          className="space-y-6 glass-card p-6 sm:p-8"
         >
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-700">
-              Выберите интерес <span className="text-red-500">*</span>
+            <label className="mb-2 block text-sm font-medium text-gray-200">
+              Выберите интерес <span className="text-purple-400">*</span>
             </label>
             <select
               name="interestId"
               required
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-base text-slate-900 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-100"
+              className="glass-effect w-full rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-base text-white placeholder:text-gray-400 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all [&>option]:bg-[#1a0b2e]"
             >
               <option value="">Выберите тему</option>
               {userInterests.length > 0 ? (
@@ -124,9 +124,9 @@ export default function CreateEventPage() {
               )}
             </select>
             {userInterests.length === 0 && (
-              <p className="mt-2 text-xs text-red-600">
+              <p className="mt-2 text-xs text-red-400">
                 У вас нет интересов. Добавьте их в{" "}
-                <Link href="/profile" className="underline">
+                <Link href="/profile" className="underline hover:text-white">
                   профиле
                 </Link>
                 .
@@ -143,13 +143,13 @@ export default function CreateEventPage() {
           />
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-700">
+            <label className="mb-2 block text-sm font-medium text-gray-200">
               Описание (необязательно)
             </label>
             <textarea
               name="description"
               rows={4}
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-base text-slate-900 placeholder:text-slate-400 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-100"
+              className="glass-effect w-full rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-base text-white placeholder:text-gray-400 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
               placeholder="Опишите, что ждет гостей..."
             />
           </div>
@@ -159,6 +159,7 @@ export default function CreateEventPage() {
             name="eventDate"
             type="datetime-local"
             required
+            className="calendar-dark"
           />
 
           <Input
@@ -190,22 +191,24 @@ export default function CreateEventPage() {
           />
 
           {error && (
-            <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
+            <div className="glass-effect rounded-xl bg-red-500/20 border border-red-500/30 p-4 text-sm text-red-200">
               {error}
             </div>
           )}
 
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             <Button
               type="submit"
               className="flex-1"
               disabled={loading || userInterests.length === 0}
+              glow
             >
               {loading ? "Создание..." : "Создать мероприятие"}
             </Button>
             <Button
               type="button"
               variant="secondary"
+              className="bg-white/10 hover:bg-white/20 text-white border-white/20"
               onClick={() => router.push("/dashboard")}
             >
               Отмена

@@ -152,7 +152,7 @@ function EventDetailsContent() {
     <div className="min-h-screen">
       <Navigation />
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="glass-card p-8 space-y-6">
+        <div className="glass-card p-6 sm:p-8 space-y-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-purple-400">
