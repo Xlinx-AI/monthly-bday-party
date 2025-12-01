@@ -61,21 +61,21 @@ export default function EventsPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen">
       <Navigation />
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">
+            <h1 className="text-3xl font-black text-gradient">
               Лента мероприятий
             </h1>
-            <p className="mt-2 text-slate-600">
+            <p className="mt-2 text-gray-300">
               Подбираем события по интересам и городу
             </p>
           </div>
         </div>
 
-        <div className="mb-8 grid gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-3">
+        <div className="mb-8 grid gap-4 rounded-2xl glass-card p-6 md:grid-cols-3">
           <Input
             label="Город"
             name="city"
@@ -94,11 +94,13 @@ export default function EventsPage() {
             <Button
               onClick={() => fetchEvents({ city, interestId })}
               className="flex-1"
+              glow
             >
               Применить
             </Button>
             <Button
               variant="secondary"
+              className="bg-white/10 hover:bg-white/20 text-white border-white/20"
               onClick={() => {
                 setCity("");
                 setInterestId("");
@@ -111,13 +113,13 @@ export default function EventsPage() {
         </div>
 
         {loading ? (
-          <div className="flex h-40 items-center justify-center rounded-lg border border-slate-200 bg-white">
-            <span className="text-slate-600">Загружаем события...</span>
+          <div className="flex h-40 items-center justify-center rounded-2xl glass-effect">
+            <span className="text-gray-300">Загружаем события...</span>
           </div>
         ) : events.length === 0 ? (
-          <div className="rounded-lg border border-slate-200 bg-white p-12 text-center">
-            <p className="text-lg text-slate-600">Нет запланированных мероприятий</p>
-            <p className="mt-2 text-sm text-slate-500">
+          <div className="rounded-2xl glass-card p-12 text-center">
+            <p className="text-xl text-white font-bold">Нет запланированных мероприятий</p>
+            <p className="mt-2 text-sm text-gray-400">
               Попробуйте изменить фильтры или загляните позже
             </p>
           </div>
@@ -126,40 +128,57 @@ export default function EventsPage() {
             {events.map((event) => (
               <div
                 key={event.id}
-                className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+                className="rounded-2xl glass-card p-6 group hover:scale-[1.02] transition-transform"
               >
                 <div className="mb-4 flex items-start justify-between">
                   <div>
-                    <h2 className="text-xl font-semibold text-slate-900">
+                    <h2 className="text-2xl font-black text-white group-hover:text-gradient transition-all">
                       {event.title}
                     </h2>
-                    <p className="mt-1 text-sm text-slate-500">
-                      {event.interest.name}
+                    <p className="mt-1 text-sm text-purple-300 font-semibold">
+                      🏷️ {event.interest.name}
                     </p>
                   </div>
-                  <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700">
+                  <span className="rounded-full glass-effect px-4 py-1.5 text-xs font-bold text-cyan-300 border border-cyan-400/30">
                     {event.status}
                   </span>
                 </div>
 
-                <p className="mb-3 line-clamp-3 text-sm text-slate-600">
+                <p className="mb-4 line-clamp-3 text-sm text-gray-300">
                   {event.description || "Организатор не добавил описание"}
                 </p>
 
-                <div className="space-y-2 text-sm text-slate-600">
-                  <p>📅 {new Date(event.eventDate).toLocaleDateString("ru-RU", { dateStyle: "full" })}</p>
-                  <p>📍 {event.location}</p>
-                  <p>👥 {event.currentGuests} / {event.maxGuests} гостей</p>
-                  <p>💰 {event.ticketPrice} ₽</p>
-                  <p>🎉 Именинник: {event.host.name}</p>
+                <div className="space-y-2 text-sm text-gray-300">
+                  <p className="flex items-center gap-2">
+                    <span>📅</span>
+                    {new Date(event.eventDate).toLocaleDateString("ru-RU", { dateStyle: "full" })}
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <span>📍</span>
+                    {event.location}
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <span>👥</span>
+                    {event.currentGuests} / {event.maxGuests} гостей
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <span>💰</span>
+                    <span className="text-cyan-400 font-bold">{event.ticketPrice} ₽</span>
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <span>🎉</span>
+                    Именинник: <span className="text-purple-400 font-bold">{event.host.name}</span>
+                  </p>
                 </div>
 
                 <div className="mt-6 flex justify-between">
                   <Link
                     href={`/events/${event.id}`}
-                    className="text-sm font-semibold text-purple-600 hover:text-purple-500"
+                    className="w-full"
                   >
-                    Подробнее
+                    <Button className="w-full" variant="secondary">
+                       👀 Подробнее
+                    </Button>
                   </Link>
                 </div>
               </div>

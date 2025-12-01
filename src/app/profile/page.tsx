@@ -132,14 +132,14 @@ export default function ProfilePage() {
     <div className="min-h-screen">
       <Navigation />
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8 space-y-8">
-        <div className="glass-card p-10 text-center">
-          <h1 className="text-4xl font-black text-gradient mb-3">Ваш профиль 12DR</h1>
+        <div className="glass-card p-6 sm:p-10 text-center">
+          <h1 className="text-3xl sm:text-4xl font-black text-gradient mb-3">Ваш профиль 12DR</h1>
           <p className="text-lg text-gray-300">
             Управляйте данными, добавляйте интересы и делайте каждый месяц праздником.
           </p>
         </div>
 
-        <form onSubmit={handleProfileUpdate} className="glass-card p-10 space-y-6">
+        <form onSubmit={handleProfileUpdate} className="glass-card p-6 sm:p-10 space-y-6">
           <div>
             <h2 className="text-2xl font-bold text-white mb-2">Основная информация</h2>
             <p className="text-sm text-gray-400">
@@ -205,7 +205,7 @@ export default function ProfilePage() {
           </Button>
         </form>
 
-        <div className="glass-card p-10 space-y-6">
+        <div className="glass-card p-6 sm:p-10 space-y-6">
           <div>
             <h2 className="text-2xl font-bold text-white mb-2">Интересы</h2>
             <p className="text-sm text-gray-400">

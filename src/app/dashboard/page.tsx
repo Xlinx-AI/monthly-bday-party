@@ -96,28 +96,28 @@ export default function DashboardPage() {
     <div className="min-h-screen">
       <Navigation />
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-8 glass-card p-8 flex items-center justify-between flex-wrap gap-4">
+        <div className="mb-8 glass-card p-6 sm:p-8 flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="text-4xl font-black text-gradient mb-2">
+            <h1 className="text-3xl sm:text-4xl font-black text-gradient mb-2">
               Привет, {user?.name}! 🎉
             </h1>
             <p className="text-gray-300 text-lg">
               Ваших интересов: <span className="text-purple-400 font-bold">{user?.interests.length || 0}</span>
             </p>
           </div>
-          <Link href="/events/create">
-            <Button size="lg" glow>🎊 Создать мероприятие</Button>
+          <Link href="/events/create" className="w-full sm:w-auto">
+            <Button size="lg" glow className="w-full sm:w-auto">🎊 Создать мероприятие</Button>
           </Link>
         </div>
 
         <div className="space-y-6">
-          <h2 className="text-3xl font-black text-white flex items-center gap-3">
+          <h2 className="text-2xl sm:text-3xl font-black text-white flex items-center gap-3">
             <span>Мои мероприятия</span>
             <span className="text-xl text-gray-400">({events.length})</span>
           </h2>
 
           {events.length === 0 ? (
-            <div className="glass-card p-12 text-center">
+            <div className="glass-card p-6 sm:p-12 text-center">
               <div className="text-6xl mb-4">🎈</div>
               <p className="text-2xl font-bold text-white mb-3">
                 У вас пока нет мероприятий
@@ -125,8 +125,8 @@ export default function DashboardPage() {
               <p className="text-gray-300 mb-6">
                 Создайте первое мероприятие и пригласите друзей отпраздновать день рождения вместе!
               </p>
-              <Link href="/events/create">
-                <Button glow>✨ Создать первое событие</Button>
+              <Link href="/events/create" className="inline-block w-full sm:w-auto">
+                <Button glow className="w-full sm:w-auto">✨ Создать первое событие</Button>
               </Link>
             </div>
           ) : (

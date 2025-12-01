@@ -76,7 +76,7 @@ export default function Home() {
               </Link>
             </div>
 
-            <div className="mt-12 grid grid-cols-3 gap-8 text-center">
+            <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
               {socialProof.map((item) => (
                 <div key={item.label} className="glass-effect rounded-2xl p-6">
                   <div className="text-3xl font-black text-gradient mb-2">{item.value}</div>
@@ -117,7 +117,7 @@ export default function Home() {
 
       <section className="px-4 py-20 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
-          <div className="glass-card p-12">
+          <div className="glass-card p-6 sm:p-12">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-black text-white mb-4">
                 Как это работает
@@ -143,7 +143,7 @@ export default function Home() {
                   description: "50% с каждого билета идёт вам. Остальное — на организацию следующего события.",
                 },
               ].map((item) => (
-                <div key={item.step} className="flex gap-6 items-start group">
+                <div key={item.step} className="flex flex-col sm:flex-row gap-6 items-start group">
                   <div className="flex-shrink-0 w-16 h-16 rounded-2xl glass-effect flex items-center justify-center text-3xl font-black text-gradient group-hover:scale-110 transition-transform">
                     {item.step}
                   </div>
