@@ -66,12 +66,14 @@ const client = createClient({
   connectionString: connectionString || "postgres://placeholder:placeholder@localhost:5432/placeholder",
 });
 
-try {
+if (connectionString) {
+  try {
     await client.connect();
-} catch (err) {
+  } catch (err) {
     console.warn("Failed to connect to database during initialization:", err);
     // Continue execution - if this is a build step that doesn't need DB, it might pass.
     // If runtime needs DB, it will fail on query.
+  }
 }
 
 export const db = drizzle(client, { schema });
